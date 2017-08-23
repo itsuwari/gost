@@ -123,7 +123,7 @@ func (tr *wsTransporter) Handshake(conn net.Conn, options ...HandshakeOption) (n
 	if opts.WSOptions != nil {
 		wsOptions = opts.WSOptions
 	}
-	url := url.URL{Scheme: "ws", Host: opts.Addr, Path: "/ws"}
+	url := url.URL{Scheme: "ws", Host: opts.Addr, Path: "/dynamic"}
 	return websocketClientConn(url.String(), conn, nil, wsOptions)
 }
 
@@ -151,7 +151,7 @@ func (tr *wssTransporter) Handshake(conn net.Conn, options ...HandshakeOption) (
 	if opts.TLSConfig == nil {
 		opts.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	}
-	url := url.URL{Scheme: "wss", Host: opts.Addr, Path: "/ws"}
+	url := url.URL{Scheme: "wss", Host: opts.Addr, Path: "/dynamic"}
 	return websocketClientConn(url.String(), conn, opts.TLSConfig, wsOptions)
 }
 
@@ -185,7 +185,7 @@ func WSListener(addr string, options *WSOptions) (Listener, error) {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/ws", http.HandlerFunc(l.upgrade))
+	mux.Handle("/dynamic", http.HandlerFunc(l.upgrade))
 	l.srv = &http.Server{Addr: addr, Handler: mux}
 
 	ln, err := net.ListenTCP("tcp", tcpAddr)
@@ -276,7 +276,7 @@ func WSSListener(addr string, tlsConfig *tls.Config, options *WSOptions) (Listen
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/ws", http.HandlerFunc(l.upgrade))
+	mux.Handle("/dynamic", http.HandlerFunc(l.upgrade))
 	l.srv = &http.Server{
 		Addr:      addr,
 		TLSConfig: tlsConfig,
